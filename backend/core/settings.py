@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # apps
     'core',
+    'users',
 
     # packages
     'rest_framework',
@@ -144,3 +145,5 @@ MEDIA_URL = '/static/media/'
 
 MEDIA_ROOT = '/vol/web/media'
 STATIC_ROOT = '/vol/web/static'
+
+AUTH_USER_MODEL = 'users.User'
