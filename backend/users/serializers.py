@@ -11,7 +11,7 @@ class UserSerializer(UserCreateSerializer):
     """User Serializer"""
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['id', 'email', 'password', 'name']
 
 
 class ProfileSerializer(UserCreateSerializer):
