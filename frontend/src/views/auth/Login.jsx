@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../utils/auth";
 import {
   validateRequiredFields,
@@ -9,11 +9,13 @@ import {
 } from "../../utils/formValidations";
 
 function Login() {
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleStateUpdate = (e) => {
     const { name, value } = e.target;
@@ -25,6 +27,9 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Reset previous errors
+    setError("");
     const { email, password } = user;
 
     // All Fields Are Required
@@ -49,13 +54,25 @@ function Login() {
 
     const { data, error } = await login(email, password);
     if (error) {
-      console.log(error);
+      setIsLoading(false);
+      alert(error);
       setUser({ email: "", password: "" });
     } else {
-      console.log(data);
+      navigate("/");
+      setIsLoading(false);
     }
   };
-
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <BaseHeader />
@@ -77,7 +94,11 @@ function Login() {
                   </span>
                 </div>
                 {/* Form */}
-                <form className="needs-validation" noValidate="">
+                <form
+                  className="needs-validation"
+                  onSubmit={handleSubmit}
+                  noValidate=""
+                >
                   {/* Email */}
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label">
@@ -136,11 +157,7 @@ function Login() {
                   </div>
                   <div>
                     <div className="d-grid">
-                      <button
-                        type="submit"
-                        onSubmit={handleSubmit}
-                        className="btn btn-primary"
-                      >
+                      <button type="submit" className="btn btn-primary">
                         Sign in <i className="fas fa-sign-in-alt"></i>
                       </button>
                     </div>

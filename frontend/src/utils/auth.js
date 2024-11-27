@@ -67,14 +67,15 @@ export const setUser = async () => {
 };
 
 export const setAuthUser = (access_token, refresh_token) => {
+  // TODO  secure must be true in production later
   Cookie.set("access_token", access_token, {
     expires: 1,
-    secure: true,
+    secure: false,
   });
 
   Cookie.set("refresh_token", refresh_token, {
     expires: 7,
-    secure: true,
+    secure: false,
   });
 
   const user = jwtDecode(access_token) ?? null;
