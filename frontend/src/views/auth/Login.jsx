@@ -1,9 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
 import { Link } from "react-router-dom";
+import { login } from "../../utils/auth";
+import {
+  validateRequiredFields,
+  validateEmail,
+} from "../../utils/formValidations";
 
 function Login() {
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+
+  const handleStateUpdate = (e) => {
+    const { name, value } = e.target;
+    setUser({
+      ...user,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { email, password } = user;
+
+    // All Fields Are Required
+    const requiredError = validateRequiredFields({
+      email,
+      password,
+    });
+    if (requiredError) {
+      setError(requiredError);
+      return;
+    }
+
+    // Email Must Be Valid
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setError(emailError);
+      return;
+    }
+
+    // TODO.... check for server side errors
+    // Account not activated, Invalid email or password, No user found with this email
+
+    const { data, error } = await login(email, password);
+    if (error) {
+      console.log(error);
+      setUser({ email: "", password: "" });
+    } else {
+      console.log(data);
+    }
+  };
+
   return (
     <>
       <BaseHeader />
@@ -26,7 +78,7 @@ function Login() {
                 </div>
                 {/* Form */}
                 <form className="needs-validation" noValidate="">
-                  {/* Username */}
+                  {/* Email */}
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label">
                       Email Address
@@ -37,7 +89,8 @@ function Login() {
                       className="form-control"
                       name="email"
                       placeholder="johndoe@gmail.com"
-                      required=""
+                      onChange={handleStateUpdate}
+                      value={user.email}
                     />
                     <div className="invalid-feedback">
                       Please enter valid username.
@@ -54,7 +107,8 @@ function Login() {
                       className="form-control"
                       name="password"
                       placeholder="**************"
-                      required=""
+                      value={user.password}
+                      onChange={handleStateUpdate}
                     />
                     <div className="invalid-feedback">
                       Please enter valid password.
@@ -62,7 +116,7 @@ function Login() {
                   </div>
                   {/* Checkbox */}
                   <div className="d-lg-flex justify-content-between align-items-center mb-4">
-                    <div className="form-check">
+                    {/* <div className="form-check">
                       <input
                         type="checkbox"
                         className="form-check-input"
@@ -75,18 +129,23 @@ function Login() {
                       <div className="invalid-feedback">
                         You must agree before submitting.
                       </div>
-                    </div>
+                    </div> */}
                     <div>
                       <Link to="/forgot-password/">Forgot your password?</Link>
                     </div>
                   </div>
                   <div>
                     <div className="d-grid">
-                      <button type="submit" className="btn btn-primary">
+                      <button
+                        type="submit"
+                        onSubmit={handleSubmit}
+                        className="btn btn-primary"
+                      >
                         Sign in <i className="fas fa-sign-in-alt"></i>
                       </button>
                     </div>
                   </div>
+                  {error ? <div style={{ color: "red" }}>{error}</div> : ""}
                 </form>
               </div>
             </div>

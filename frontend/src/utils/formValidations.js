@@ -1,6 +1,8 @@
-export const validateRequiredFields = (name, email, password, re_password) => {
-  if (!name || !email || !password || !re_password) {
-    return "All fields are required.";
+export const validateRequiredFields = (fields) => {
+  for (const [key, value] of Object.entries(fields)) {
+    if (!value) {
+      return `${key} is required.`;
+    }
   }
   return null; // No error
 };

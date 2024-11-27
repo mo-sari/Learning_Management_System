@@ -19,7 +19,7 @@ export const login = async (email, password) => {
   } catch (error) {
     return {
       data: null,
-      error: error.response.data?.detail || "Something went wrong",
+      error,
     };
   }
 };

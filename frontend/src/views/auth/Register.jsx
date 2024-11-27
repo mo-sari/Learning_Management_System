@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { register } from "../../utils/auth";
 import {
   validateRequiredFields,
@@ -11,7 +11,6 @@ import {
 } from "../../utils/formValidations";
 
 function Register() {
-  const navigate = useNavigate();
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -35,12 +34,12 @@ function Register() {
     const { name, email, password, re_password } = user;
 
     // All Fields Are Required
-    const requiredError = validateRequiredFields(
+    const requiredError = validateRequiredFields({
       name,
       email,
       password,
-      re_password
-    );
+      re_password,
+    });
     if (requiredError) {
       setError(requiredError);
       return;
