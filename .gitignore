@@ -92,3 +92,4 @@ yarn-error.log
 .git/
 .gitmodules
 *.lock
+backend/core/__pycache__/settings.cpython-310.pyc
