@@ -7,6 +7,7 @@ import {
   Login,
   Logout,
   Register,
+  AccountActivation,
 } from "./views/auth";
 import { Home } from "./Home";
 
@@ -18,9 +19,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/register/" element={<Register />} />
           <Route path="/login/" element={<Login />} />
+          <Route path="/activate/:uid/:token" element={<AccountActivation />} />
         </Routes>
       </MainWrapper>
-      <h1>hello</h1>
     </BrowserRouter>
   );
 }
