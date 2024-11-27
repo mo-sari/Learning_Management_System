@@ -4,6 +4,7 @@ import Login from "./Login";
 import Logout from "./Logout";
 import Register from "./Register";
 import AccountActivation from "./AccountActivation";
+import PasswordChangeConfirmation from "./PasswordChangeConfirmation";
 export {
   CreateNewPassword,
   ForgotPassword,
@@ -11,4 +12,5 @@ export {
   Logout,
   Register,
   AccountActivation,
+  PasswordChangeConfirmation,
 };

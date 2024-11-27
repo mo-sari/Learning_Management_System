@@ -8,6 +8,7 @@ import {
   Logout,
   Register,
   AccountActivation,
+  PasswordChangeConfirmation,
 } from "./views/auth";
 import { Home } from "./Home";
 
@@ -21,6 +22,15 @@ function App() {
           <Route path="/login/" element={<Login />} />
           <Route path="/activate/:uid/:token" element={<AccountActivation />} />
           <Route path="/logout/" element={<Logout />} />
+          <Route path="/forgot-password/" element={<ForgotPassword />} />
+          <Route
+            path="/password/reset/confirm/:uid/:token/"
+            element={<CreateNewPassword />}
+          />
+          <Route
+            path="/password-reset-complete/"
+            element={<PasswordChangeConfirmation />}
+          />
         </Routes>
       </MainWrapper>
     </BrowserRouter>
