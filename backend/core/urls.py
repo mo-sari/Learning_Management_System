@@ -16,6 +16,9 @@ urlpatterns = [
          name='api-docs'),
     re_path(r'^auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.jwt')),
+
+    # apps
+    path('api/', include('api.urls')),
 ]
 
 if settings.DEBUG:
