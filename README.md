@@ -14,3 +14,8 @@ containerized postgresql database.
 2- docker-compose exec db sh ==> open a shell inside postgresql container
 3- psql -U <db_user> -d <db_name> ==> connect to the database
 4- use \q for quiting the shell.
+
+## API Views.
+
+If you want to retrieve a single object based on some criteria other than id (e.g., a slug, username, or other unique field), you override the get_object method,If you want to retrieve a queryset filtered by some criteria (e.g., all objects with a certain status, all posts for a category, etc.), you override the get_queryset method.(in both these cases you are getting the parameter in url)
+if you're not getting the value in url and want to change the criteria, just set lookup_field='<new_criteria>'
