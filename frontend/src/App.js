@@ -10,14 +10,20 @@ import {
   AccountActivation,
   PasswordChangeConfirmation,
 } from "./views/auth";
-import { Home } from "./Home";
+import {
+  Cart,
+  Checkout,
+  Home,
+  Search,
+  CourseDetail,
+  Success,
+} from "./views/base";
 
 function App() {
   return (
     <BrowserRouter>
       <MainWrapper>
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route path="/register/" element={<Register />} />
           <Route path="/login/" element={<Login />} />
           <Route path="/activate/:uid/:token" element={<AccountActivation />} />
@@ -31,6 +37,10 @@ function App() {
             path="/password-reset-complete/"
             element={<PasswordChangeConfirmation />}
           />
+
+          {/* Courses Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/course-detail/:slug" element={<CourseDetail />} />
         </Routes>
       </MainWrapper>
     </BrowserRouter>

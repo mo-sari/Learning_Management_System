@@ -23,7 +23,6 @@ function ForgotPassword() {
         "Password Reset Email Sent, Please visit your email and click on the link"
       );
     } catch (error) {
-      console.log("error: ", error);
       setIsLoading(false);
     } finally {
       setEmail("");

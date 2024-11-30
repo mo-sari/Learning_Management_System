@@ -63,8 +63,7 @@ NOTI_TYPE = (
 
 class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.FileField(upload_to="course-file", blank=True, null=True,
-                             default="default.jpg")
+    image = models.FileField(upload_to="course-file", blank=True, null=True)
     full_name = models.CharField(max_length=100)
     bio = models.CharField(max_length=100, null=True, blank=True)
     facebook = models.URLField(null=True, blank=True)
@@ -88,8 +87,7 @@ class Teacher(models.Model):
 
 class Category(models.Model):
     title = models.CharField(max_length=100)
-    image = models.FileField(upload_to="course-file", default="category.jpg",
-                             null=True, blank=True)
+    image = models.FileField(upload_to="course-file", null=True, blank=True)
     active = models.BooleanField(default=True)
     slug = models.SlugField(unique=True, null=True, blank=True)
 

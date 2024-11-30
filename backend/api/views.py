@@ -39,16 +39,11 @@ class CourseListAPIView(generics.ListAPIView):
 class CourseDetailAPIView(generics.RetrieveAPIView):
     serializer_class = api_serializer.CourseSerializer
     permission_classes = [AllowAny]
-    queryset = api_models.Course.objects.filter(
-        platform_status="Published",
-        teacher_course_status="Published")
+    queryset = api_models.Course.objects.all()
 
     def get_object(self):
         slug = self.kwargs['slug']
-        course = api_models.Course.objects.get(
-            slug=slug,
-            platform_status="Published",
-            teacher_course_status="Published")
+        course = api_models.Course.objects.get(slug=slug)
         return course
 
 
