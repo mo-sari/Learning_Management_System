@@ -70,12 +70,12 @@ export const setAuthUser = (access_token, refresh_token) => {
   // TODO  secure must be true in production later
   Cookie.set("access_token", access_token, {
     expires: 1,
-    secure: false,
+    secure: true,
   });
 
   Cookie.set("refresh_token", refresh_token, {
     expires: 7,
-    secure: false,
+    secure: true,
   });
 
   const user = jwtDecode(access_token) ?? null;
