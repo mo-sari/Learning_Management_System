@@ -4,7 +4,7 @@ import BaseFooter from "../partials/BaseFooter";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Rater from "react-rater";
-import useFetchCourses from "./CustomHooks";
+import { useFetchCourses } from "./CustomHooks";
 
 function Index() {
   const { fetchCourses, courses, isLoading, error } = useFetchCourses();

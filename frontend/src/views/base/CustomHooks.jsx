@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import useAxios from "../../utils/useAxios";
-import apiInstance from "../../utils/axios";
+import Toast from "../plugin/Toast";
 
-const useFetchCourses = () => {
+export const useFetchCourses = () => {
   const axiosInstance = useAxios();
   const [isLoading, setIsLoading] = useState(false);
   const [courses, setCourses] = useState([]);
@@ -23,4 +23,45 @@ const useFetchCourses = () => {
   return { fetchCourses, courses, isLoading, error };
 };
 
-export default useFetchCourses;
+export const useFetchSingleCourse = (slug) => {
+  const axiosInstance = useAxios();
+  const [isLoading, setIsLoading] = useState(false);
+  const [course, setCourse] = useState({});
+  const [error, setError] = useState(null);
+
+  const fetchCourse = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await axiosInstance.get(`api/course/course-detail/${slug}/`);
+      setCourse(res.data);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [axiosInstance, slug]);
+
+  return { fetchCourse, course, isLoading, error };
+};
+
+export const useAddToCart = () => {
+  const axiosInstance = useAxios();
+  const [addToCartBtn, setAddToCartBtn] = useState("Add To Cart");
+
+  const addingFunc = async (formData, cartId) => {
+    setAddToCartBtn("Adding To Cart");
+    try {
+      await axiosInstance.post(`api/course/cart/`, formData);
+      setAddToCartBtn("Added To Cart");
+      Toast().fire({
+        title: "Added To Cart",
+        icon: "success",
+      });
+    } catch (err) {
+      console.log(err);
+      setAddToCartBtn("Add To Cart");
+    }
+  };
+
+  return { addingFunc, addToCartBtn, setAddToCartBtn };
+};

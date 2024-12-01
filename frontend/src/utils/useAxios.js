@@ -29,47 +29,90 @@
 
 // export default useAxios;
 
+// import axios from "axios";
+// import { getRefreshedToken, isAccessTokenExpired, setAuthUser } from "./auth";
+// import Cookies from "js-cookie";
+// import { URL } from "./constants";
+
+// const useAxios = () => {
+//   const axiosInstance = axios.create({
+//     baseURL: URL,
+//     headers: {
+//       "Content-Type": "application/json",
+//       Accept: "application/json",
+//     },
+//   });
+
+//   axiosInstance.interceptors.request.use(
+//     async (req) => {
+//       const accessToken = Cookies.get("access_token");
+//       const refreshToken = Cookies.get("refresh_token");
+
+//       if (accessToken && isAccessTokenExpired(accessToken)) {
+//         try {
+//           const response = await getRefreshedToken(refreshToken);
+//           setAuthUser(response.access, response.refresh);
+//           req.headers.Authorization = `Bearer ${response.access}`;
+//         } catch (error) {
+//           console.error("Token refresh failed:", error);
+//         }
+//       } else {
+//         req.headers.Authorization = `Bearer ${accessToken}`;
+//       }
+//       return req;
+//     },
+//     (error) => {
+//       return Promise.reject(error);
+//     }
+//   );
+
+//   return axiosInstance;
+// };
+
+// export default useAxios;
+
+
+import { useMemo } from "react";
 import axios from "axios";
 import { getRefreshedToken, isAccessTokenExpired, setAuthUser } from "./auth";
 import Cookies from "js-cookie";
 import { URL } from "./constants";
 
 const useAxios = () => {
-  const axiosInstance = axios.create({
-    baseURL: URL,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
+  const axiosInstance = useMemo(() => {
+    const instance = axios.create({
+      baseURL: URL,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
 
-  // Axios request interceptor
-  axiosInstance.interceptors.request.use(
-    async (req) => {
-      const accessToken = Cookies.get("access_token");
-      const refreshToken = Cookies.get("refresh_token");
+    // Axios request interceptor
+    instance.interceptors.request.use(
+      async (req) => {
+        const accessToken = Cookies.get("access_token");
+        const refreshToken = Cookies.get("refresh_token");
 
-      // If the access token is expired, try to refresh it
-      if (accessToken && isAccessTokenExpired(accessToken)) {
-        try {
-          const response = await getRefreshedToken(refreshToken);
-          setAuthUser(response.access, response.refresh);
-          req.headers.Authorization = `Bearer ${response.access}`;
-        } catch (error) {
-          console.error("Token refresh failed:", error);
-          // Handle token refresh failure (logout or redirect)
+        if (accessToken && isAccessTokenExpired(accessToken)) {
+          try {
+            const response = await getRefreshedToken(refreshToken);
+            setAuthUser(response.access, response.refresh);
+            req.headers.Authorization = `Bearer ${response.access}`;
+          } catch (error) {
+            console.error("Token refresh failed:", error);
+            // Handle token refresh failure (logout or redirect)
+          }
+        } else {
+          req.headers.Authorization = `Bearer ${accessToken}`;
         }
-      } else {
-        // If access token is still valid, set it in the Authorization header
-        req.headers.Authorization = `Bearer ${accessToken}`;
-      }
-      return req;
-    },
-    (error) => {
-      // Handle any error in the request setup
-      return Promise.reject(error);
-    }
-  );
+        return req;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    return instance;
+  }, []);
 
   return axiosInstance;
 };
