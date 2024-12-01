@@ -41,6 +41,7 @@ function App() {
           {/* Courses Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/course-detail/:slug" element={<CourseDetail />} />
+          <Route path="/cart/" element={<Cart/>} />
         </Routes>
       </MainWrapper>
     </BrowserRouter>

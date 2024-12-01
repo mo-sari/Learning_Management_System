@@ -2,8 +2,7 @@ import React from "react";
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import Rater from "react-rater";
+import {  useEffect } from "react";
 import { useFetchCourses } from "./CustomHooks";
 
 function Index() {
@@ -271,7 +270,7 @@ function Index() {
                 <div className="position-relative">
                   <img
                     src="https://geeksui.codescandy.com/geeks/assets/images/png/cta-instructor-1.png"
-                    alt="image"
+                    alt=""
                     className="img-fluid mt-n8"
                   />
                   <div className="ms-n8 position-absolute bottom-0 start-0 mb-6">
