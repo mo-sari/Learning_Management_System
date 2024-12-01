@@ -41,6 +41,16 @@ function Cart() {
         fetchCartStats();
     },[])
 
+    const handleRemoveCart = async (itemId)=>{
+        try {
+            await apiInstance.delete(`api/course/cart-item-delete/${CartId()}/${itemId}/`)
+            fetchCartList();
+            fetchCartStats();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
 
     return (
         <>
@@ -103,7 +113,7 @@ function Cart() {
                                                         <h5 className="text-success mb-0">${c.course.price}</h5>
                                                     </td>
                                                     <td>
-                                                        <button className="btn btn-sm btn-danger px-2 mb-0" type='button'>
+                                                        <button className="btn btn-sm btn-danger px-2 mb-0" type='button' onClick={() => handleRemoveCart(c.id)}>
                                                             <RxCross2 />
                                                         </button>
                                                     </td>
