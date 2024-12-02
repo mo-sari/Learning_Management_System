@@ -1,3 +1,5 @@
-const URL = "http://localhost:8000/";
+import UserData from "../views/plugin/UserData";
 
-export { URL };
+const URL = "http://localhost:8000/";
+const userId = UserData()?.user_id;
+export { URL, userId };

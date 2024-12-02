@@ -1,21 +1,59 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
 
 import { RxCross2 } from "react-icons/rx";
 import { useCartContext } from "../../context/CartContext";
+import CartId from "../plugin/CartId";
+import { userId } from "../../utils/constants";
+import apiInstance from "../../utils/axios";
 
 function Cart() {
+  const [bioData, setBioData] = useState({
+    full_name: "",
+    email: "",
+    country: "",
+  });
+
   const { fetchCartList, fetchCartStats, stats, cartList, removeFromCart } =
     useCartContext();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCartList();
     fetchCartStats();
   }, []);
+
+  const handleBioData = (e) => {
+    const { name, value } = e.target;
+    setBioData({
+      ...bioData,
+      [name]: value,
+    });
+  };
+
+  const createOrder = async (e) => {
+    e.preventDefault();
+    const formdata = new FormData();
+
+    formdata.append("full_name", bioData.full_name);
+    formdata.append("email", bioData.email);
+    formdata.append("country", bioData.country);
+    formdata.append("cart_id", CartId());
+    formdata.append("user_id", userId);
+
+    // TODO ... before sending the data I should check for all validation functions here
+    try {
+      await apiInstance.post(`api/order/create-order/`, formdata);
+      navigate("/checkout/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -58,7 +96,7 @@ function Cart() {
 
       <section className="pt-5">
         <div className="container">
-          <form>
+          <form onSubmit={createOrder}>
             <div className="row g-4 g-sm-5">
               {/* Main content START */}
               <div className="col-lg-8 mb-4 mb-sm-0">
@@ -70,7 +108,7 @@ function Cart() {
                       <tbody className="border-top-2">
                         {cartList.map((c, i) => {
                           return (
-                            <tr>
+                            <tr key={i}>
                               <td>
                                 <div className="d-lg-flex align-items-center">
                                   <div className="w-100px w-md-80px mb-2 mb-md-0">
@@ -133,6 +171,9 @@ function Cart() {
                         className="form-control"
                         id="yourName"
                         placeholder="Name"
+                        name="full_name"
+                        value={bioData.full_name}
+                        onChange={handleBioData}
                       />
                     </div>
                     {/* Email */}
@@ -145,6 +186,9 @@ function Cart() {
                         className="form-control"
                         id="emailInput"
                         placeholder="Email"
+                        name="email"
+                        value={bioData.email}
+                        onChange={handleBioData}
                       />
                     </div>
 
@@ -158,6 +202,9 @@ function Cart() {
                         className="form-control"
                         id="mobileNumber"
                         placeholder="Country"
+                        name="country"
+                        value={bioData.country}
+                        onChange={handleBioData}
                       />
                     </div>
                   </div>
@@ -186,9 +233,9 @@ function Cart() {
                     </li>
                   </ul>
                   <div className="d-grid">
-                    <Link to={`/checkout/`} className="btn btn-lg btn-success">
+                    <button type="submit" className="btn btn-lg btn-success">
                       Proceed to Checkout
-                    </Link>
+                    </button>
                   </div>
                   <p className="small mb-0 mt-2 text-center">
                     By proceeding to checkout, you agree to these{" "}

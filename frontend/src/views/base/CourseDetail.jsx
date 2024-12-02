@@ -8,14 +8,13 @@ import moment from "moment";
 
 import CartId from "../plugin/CartId";
 import GetCurrentAddress from "../plugin/UserCountry";
-import UserData from "../plugin/UserData";
 import { useCartContext } from "../../context/CartContext";
+import { userId } from "../../utils/constants";
 
 function CourseDetail() {
   const { addToCartBtn, addToCart } = useCartContext();
 
   const country = GetCurrentAddress().country;
-  const userId = UserData().user_id;
   const { slug } = useParams();
 
   const { fetchCourse, course, isLoading, error } = useFetchSingleCourse(slug);

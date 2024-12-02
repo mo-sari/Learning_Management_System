@@ -11,7 +11,7 @@ function UserData() {
 
     return decoded;
   } else {
-    // pass
+    console.log("there was a problem with tokens probably");
   }
 }
 

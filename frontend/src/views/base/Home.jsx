@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useFetchCourses } from "./CustomHooks";
 import { useCartContext } from "../../context/CartContext";
-import UserData from "../plugin/UserData";
+import { userId } from "../../utils/constants";
 import GetCurrentAddress from "../plugin/UserCountry";
 import CartId from "../plugin/CartId";
 
@@ -14,7 +14,6 @@ function Index() {
   const { addToCart } = useCartContext();
 
   const country = GetCurrentAddress().country;
-  const userId = UserData().user_id;
 
   useEffect(() => {
     fetchCourses(); // Call the function here
