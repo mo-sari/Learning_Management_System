@@ -2,6 +2,7 @@ import { useAuthStore } from "../store/auth";
 import axios from "./axios";
 import { jwtDecode } from "jwt-decode";
 import Cookie from "js-cookie";
+import { useNavigate } from "react-router-dom";
 // import Swal from "sweetalert2";
 
 export const login = async (email, password) => {

@@ -48,8 +48,8 @@ function Cart() {
 
     // TODO ... before sending the data I should check for all validation functions here
     try {
-      await apiInstance.post(`api/order/create-order/`, formdata);
-      navigate("/checkout/");
+      const res = await apiInstance.post(`api/order/create-order/`, formdata);
+      navigate(`/checkout/${res.data.order_oid}`);
     } catch (error) {
       console.log(error);
     }

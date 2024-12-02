@@ -47,7 +47,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/course-detail/:slug" element={<CourseDetail />} />
             <Route path="/cart/" element={<Cart />} />
-            <Route path="/checkout/" element={<Checkout />} />
+            <Route path="/checkout/:order_oid/" element={<Checkout />} />
           </Routes>
         </MainWrapper>
       </CartProvider>
