@@ -2,11 +2,19 @@ import React from "react";
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
 import { Link } from "react-router-dom";
-import {  useEffect } from "react";
+import { useEffect } from "react";
 import { useFetchCourses } from "./CustomHooks";
+import { useCartContext } from "../../context/CartContext";
+import UserData from "../plugin/UserData";
+import GetCurrentAddress from "../plugin/UserCountry";
+import CartId from "../plugin/CartId";
 
 function Index() {
-  const { fetchCourses, courses, isLoading, error } = useFetchCourses();
+  const { fetchCourses, courses } = useFetchCourses();
+  const { addToCart } = useCartContext();
+
+  const country = GetCurrentAddress().country;
+  const userId = UserData().user_id;
 
   useEffect(() => {
     fetchCourses(); // Call the function here
@@ -210,6 +218,15 @@ function Index() {
                               <button
                                 type="button"
                                 className="text-inherit text-decoration-none btn btn-primary me-2"
+                                onClick={() =>
+                                  addToCart(
+                                    c?.id,
+                                    userId,
+                                    c?.price,
+                                    country,
+                                    CartId()
+                                  )
+                                }
                               >
                                 Add To Cart
                                 <i className="fas fa-shopping-cart text-primary text-white" />

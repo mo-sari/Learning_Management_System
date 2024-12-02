@@ -1,43 +1,30 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import {  useEffect} from "react";
+import { useEffect } from "react";
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
-import { useFetchSingleCourse, useAddToCart } from "./CustomHooks";
+import { useFetchSingleCourse } from "./CustomHooks";
 import moment from "moment";
 
 import CartId from "../plugin/CartId";
 import GetCurrentAddress from "../plugin/UserCountry";
 import UserData from "../plugin/UserData";
+import { useCartContext } from "../../context/CartContext";
 
 function CourseDetail() {
-  const { addingFunc, addToCartBtn } = useAddToCart();
+  const { addToCartBtn, addToCart } = useCartContext();
 
   const country = GetCurrentAddress().country;
   const userId = UserData().user_id;
   const { slug } = useParams();
-
-
 
   const { fetchCourse, course, isLoading, error } = useFetchSingleCourse(slug);
 
   useEffect(() => {
     fetchCourse();
   }, [fetchCourse]);
-  console.log(course)
+  console.log(course);
 
-
-  const addToCart = async (courseId, userId, price, country, cartId) => {
-    const formdata = new FormData();
-
-    formdata.append("course_id", courseId);
-    formdata.append("user_id", userId);
-    formdata.append("price", price);
-    formdata.append("country_name", country);
-    formdata.append("cart_id", cartId);
-
-    addingFunc(formdata);
-  };
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -1379,8 +1366,7 @@ function CourseDetail() {
             </div>
             <div className="row">
               <div className="col-md-12">
-                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                </div>
+                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4"></div>
               </div>
             </div>
           </div>
@@ -1390,7 +1376,6 @@ function CourseDetail() {
       <BaseFooter />
     </>
   );
-
 }
 
 export default CourseDetail;

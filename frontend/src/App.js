@@ -18,32 +18,38 @@ import {
   CourseDetail,
   Success,
 } from "./views/base";
+import { CartProvider } from "./context/CartContext";
 
 function App() {
   return (
     <BrowserRouter>
-      <MainWrapper>
-        <Routes>
-          <Route path="/register/" element={<Register />} />
-          <Route path="/login/" element={<Login />} />
-          <Route path="/activate/:uid/:token" element={<AccountActivation />} />
-          <Route path="/logout/" element={<Logout />} />
-          <Route path="/forgot-password/" element={<ForgotPassword />} />
-          <Route
-            path="/password/reset/confirm/:uid/:token/"
-            element={<CreateNewPassword />}
-          />
-          <Route
-            path="/password-reset-complete/"
-            element={<PasswordChangeConfirmation />}
-          />
+      <CartProvider>
+        <MainWrapper>
+          <Routes>
+            <Route path="/register/" element={<Register />} />
+            <Route path="/login/" element={<Login />} />
+            <Route
+              path="/activate/:uid/:token"
+              element={<AccountActivation />}
+            />
+            <Route path="/logout/" element={<Logout />} />
+            <Route path="/forgot-password/" element={<ForgotPassword />} />
+            <Route
+              path="/password/reset/confirm/:uid/:token/"
+              element={<CreateNewPassword />}
+            />
+            <Route
+              path="/password-reset-complete/"
+              element={<PasswordChangeConfirmation />}
+            />
 
-          {/* Courses Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/course-detail/:slug" element={<CourseDetail />} />
-          <Route path="/cart/" element={<Cart/>} />
-        </Routes>
-      </MainWrapper>
+            {/* Courses Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/course-detail/:slug" element={<CourseDetail />} />
+            <Route path="/cart/" element={<Cart />} />
+          </Routes>
+        </MainWrapper>
+      </CartProvider>
     </BrowserRouter>
   );
 }
