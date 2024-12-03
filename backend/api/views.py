@@ -242,47 +242,121 @@ class CheckoutAPIView(generics.RetrieveAPIView):
     lookup_field = 'oid'
 
 
+# class CouponApplyAPIView(generics.CreateAPIView):
+#     serializer_class = api_serializer.CouponSerializer
+#     permission_classes = [AllowAny]
+
+#     def create(self, request, *args, **kwargs):
+#         order_oid = request.data['order_oid']
+#         coupon_code = request.data['coupon_code']
+
+#         order = api_models.CartOrder.objects.get(oid=order_oid)
+#         coupon = api_models.Coupon.objects.get(code=coupon_code)
+
+#         if coupon:
+#             order_items = api_models.CartOrderItem.objects.filter(
+#                 order=order,
+#                 teacher=coupon.teacher)
+
+#             for i in order_items:
+#                 if coupon not in i.coupons.all():
+#                     discount = i.total * coupon.discount / 100
+
+#                     i.total -= discount
+#                     i.price -= discount
+#                     i.saved += discount
+#                     i.applied_coupon = True
+#                     i.coupons.add(coupon)
+
+#                     order.coupons.add(coupon)
+#                     order.total -= discount
+#                     order.sub_total -= discount
+#                     order.saved += discount
+
+#                     i.save()
+#                     order.save()
+#                     coupon.used_by.add(order.student)
+#                     return Response({"message": "Coupon Found and Activated",
+#                                      "icon": "success"},
+#                                     status=status.HTTP_201_CREATED)
+#                 else:
+#                     return Response({"message": "Coupon Already Applied",
+#                                      "icon": "warning"},
+#                                     status=status.HTTP_200_OK)
+#         else:
+#             return Response({"message": "Coupon Not Found", "icon": "error"},
+#                             status=status.HTTP_404_NOT_FOUND)
+from rest_framework.response import Response
+from rest_framework import status, generics
+from rest_framework.permissions import AllowAny
+from django.core.exceptions import ObjectDoesNotExist
+
 class CouponApplyAPIView(generics.CreateAPIView):
     serializer_class = api_serializer.CouponSerializer
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-        order_oid = request.data['order_oid']
-        coupon_code = request.data['coupon_code']
+        try:
+            order_oid = request.data.get('order_oid')
+            coupon_code = request.data.get('coupon_code')
 
-        order = api_models.CartOrder.objects.get(oid=order_oid)
-        coupon = api_models.Coupon.objects.get(code=coupon_code)
+            # Validate order and coupon
+            order = api_models.CartOrder.objects.get(oid=order_oid)
+            coupon = api_models.Coupon.objects.get(code=coupon_code)
 
-        if coupon:
+            # Find order items linked to the coupon's teacher
             order_items = api_models.CartOrderItem.objects.filter(
                 order=order,
-                teacher=coupon.teacher)
+                teacher=coupon.teacher
+            )
 
-            for i in order_items:
-                if coupon not in i.coupons.all():
-                    discount = i.total * coupon.discount / 100
+            # Process each order item
+            if order_items.exists():
+                for item in order_items:
+                    if coupon not in item.coupons.all():
+                        discount = item.total * coupon.discount / 100
 
-                    i.total -= discount
-                    i.price -= discount
-                    i.saved += discount
-                    i.applied_coupon = True
-                    i.coupons.add(coupon)
+                        # Update item totals and apply coupon
+                        item.total -= discount
+                        item.price -= discount
+                        item.saved += discount
+                        item.applied_coupon = True
+                        item.coupons.add(coupon)
 
-                    order.coupons.add(coupon)
-                    order.total -= discount
-                    order.sub_total -= discount
-                    order.saved += discount
+                        # Update order totals
+                        order.coupons.add(coupon)
+                        order.total -= discount
+                        order.sub_total -= discount
+                        order.saved += discount
 
-                    i.save()
-                    order.save()
-                    coupon.used_by.add(order.student)
-                    return Response({"message": "Coupon Found and Activated",
-                                     "icon": "success"},
-                                    status=status.HTTP_201_CREATED)
-                else:
-                    return Response({"message": "Coupon Already Applied",
-                                     "icon": "warning"},
-                                    status=status.HTTP_200_OK)
-        else:
-            return Response({"message": "Coupon Not Found", "icon": "error"},
-                            status=status.HTTP_404_NOT_FOUND)
+                        # Save changes
+                        item.save()
+                        order.save()
+
+                        # Add coupon usage
+                        coupon.used_by.add(order.student)
+
+                        return Response(
+                            {"message": "Coupon Found and Activated", "icon": "success"},
+                            status=status.HTTP_201_CREATED,
+                        )
+                return Response(
+                    {"message": "Coupon Already Applied", "icon": "warning"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": "No items eligible for the coupon", "icon": "info"},
+                    status=status.HTTP_200_OK,
+                )
+
+        except ObjectDoesNotExist:
+            return Response(
+                {"message": "Invalid Order or Coupon", "icon": "error"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"message": f"An error occurred: {str(e)}", "icon": "error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

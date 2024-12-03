@@ -48,6 +48,7 @@ function App() {
             <Route path="/course-detail/:slug" element={<CourseDetail />} />
             <Route path="/cart/" element={<Cart />} />
             <Route path="/checkout/:order_oid/" element={<Checkout />} />
+            <Route path="/search/" element={<Search />} />
           </Routes>
         </MainWrapper>
       </CartProvider>

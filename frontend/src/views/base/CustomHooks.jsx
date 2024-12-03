@@ -20,7 +20,7 @@ export const useFetchCourses = () => {
     }
   };
 
-  return { fetchCourses, courses, isLoading, error };
+  return { fetchCourses, courses, isLoading, error, setCourses };
 };
 
 export const useFetchSingleCourse = (slug) => {
@@ -42,26 +42,4 @@ export const useFetchSingleCourse = (slug) => {
   }, [axiosInstance, slug]);
 
   return { fetchCourse, course, isLoading, error };
-};
-
-export const useAddToCart = () => {
-  const axiosInstance = useAxios();
-  const [addToCartBtn, setAddToCartBtn] = useState("Add To Cart");
-
-  const addingFunc = async (formData, cartId) => {
-    setAddToCartBtn("Adding To Cart");
-    try {
-      await axiosInstance.post(`api/course/cart/`, formData);
-      setAddToCartBtn("Added To Cart");
-      Toast().fire({
-        title: "Added To Cart",
-        icon: "success",
-      });
-    } catch (err) {
-      console.log(err);
-      setAddToCartBtn("Add To Cart");
-    }
-  };
-
-  return { addingFunc, addToCartBtn, setAddToCartBtn };
 };

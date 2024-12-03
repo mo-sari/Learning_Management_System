@@ -5,9 +5,12 @@ import BaseFooter from "../partials/BaseFooter";
 import { useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import apiInstance from "../../utils/axios";
+import Toast from "../plugin/Toast";
 
 function Checkout() {
   const [order, setOrder] = useState([]);
+  const [coupon, setCoupon] = useState("");
+
   const { order_oid } = useParams();
 
   const fetchOrder = async (e) => {
@@ -22,6 +25,29 @@ function Checkout() {
   useEffect(() => {
     fetchOrder();
   }, [order_oid]);
+
+  const handleCouponAplly = async () => {
+    const formData = new FormData();
+
+    formData.append("order_oid", order?.oid);
+    formData.append("coupon_code", coupon);
+
+    try {
+      const res = await apiInstance.post(`api/order/coupon/`, formData);
+      fetchOrder();
+      Toast().fire({
+        icon: res.data.icon,
+        title: res.data.message,
+      });
+    } catch (error) {
+      if (error.response.data.includes("Coupon matching query does not exi")) {
+        Toast().fire({
+          icon: "error",
+          title: "Coupon does not exist",
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -236,8 +262,14 @@ function Checkout() {
                       <input
                         className="form-control form-control"
                         placeholder="COUPON CODE"
+                        name="COUPON CODE"
+                        onChange={(e) => setCoupon(e.target.value)}
                       />
-                      <button type="button" className="btn btn-primary">
+                      <button
+                        type="button"
+                        onClick={handleCouponAplly}
+                        className="btn btn-primary"
+                      >
                         Apply
                       </button>
                     </div>
