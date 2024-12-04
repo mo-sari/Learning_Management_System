@@ -5,7 +5,8 @@ from django.utils import timezone
 
 from users.models import User, Profile
 from shortuuid.django_fields import ShortUUIDField
-from moviepy.video.io import VideoFileClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
+
 
 import math
 
@@ -134,8 +135,9 @@ class Course(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        if self.slug in (" ", None):
-            self.slug = slugify(self.title) + str(self.pk)
+        if not self.slug or self.slug.strip() == "":
+            super(Course, self).save(*args, **kwargs)
+            self.slug = f"{slugify(self.title)}-{self.pk}"
         super(Course, self).save(*args, **kwargs)
 
     def students(self):

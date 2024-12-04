@@ -12,7 +12,7 @@ class UserAdmin(BaseUserAdmin):
     """Admin panel's user configuration"""
 
     ordering = ['id']
-    list_display = ['email', 'name']
+    list_display = ['id', 'email', 'name']
     fieldsets = [
         (None, {"fields": ('password', 'email')}),
         (_('Permissions'), {"fields": ('is_active',

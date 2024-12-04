@@ -10,6 +10,7 @@ from users.models import (
     Profile,
     User
 )
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class ProfileAPIView(generics.RetrieveUpdateAPIView):
@@ -242,55 +243,6 @@ class CheckoutAPIView(generics.RetrieveAPIView):
     lookup_field = 'oid'
 
 
-# class CouponApplyAPIView(generics.CreateAPIView):
-#     serializer_class = api_serializer.CouponSerializer
-#     permission_classes = [AllowAny]
-
-#     def create(self, request, *args, **kwargs):
-#         order_oid = request.data['order_oid']
-#         coupon_code = request.data['coupon_code']
-
-#         order = api_models.CartOrder.objects.get(oid=order_oid)
-#         coupon = api_models.Coupon.objects.get(code=coupon_code)
-
-#         if coupon:
-#             order_items = api_models.CartOrderItem.objects.filter(
-#                 order=order,
-#                 teacher=coupon.teacher)
-
-#             for i in order_items:
-#                 if coupon not in i.coupons.all():
-#                     discount = i.total * coupon.discount / 100
-
-#                     i.total -= discount
-#                     i.price -= discount
-#                     i.saved += discount
-#                     i.applied_coupon = True
-#                     i.coupons.add(coupon)
-
-#                     order.coupons.add(coupon)
-#                     order.total -= discount
-#                     order.sub_total -= discount
-#                     order.saved += discount
-
-#                     i.save()
-#                     order.save()
-#                     coupon.used_by.add(order.student)
-#                     return Response({"message": "Coupon Found and Activated",
-#                                      "icon": "success"},
-#                                     status=status.HTTP_201_CREATED)
-#                 else:
-#                     return Response({"message": "Coupon Already Applied",
-#                                      "icon": "warning"},
-#                                     status=status.HTTP_200_OK)
-#         else:
-#             return Response({"message": "Coupon Not Found", "icon": "error"},
-#                             status=status.HTTP_404_NOT_FOUND)
-from rest_framework.response import Response
-from rest_framework import status, generics
-from rest_framework.permissions import AllowAny
-from django.core.exceptions import ObjectDoesNotExist
-
 class CouponApplyAPIView(generics.CreateAPIView):
     serializer_class = api_serializer.CouponSerializer
     permission_classes = [AllowAny]
@@ -337,7 +289,8 @@ class CouponApplyAPIView(generics.CreateAPIView):
                         coupon.used_by.add(order.student)
 
                         return Response(
-                            {"message": "Coupon Found and Activated", "icon": "success"},
+                            {"message": "Coupon Found and Activated",
+                             "icon": "success"},
                             status=status.HTTP_201_CREATED,
                         )
                 return Response(
@@ -346,7 +299,8 @@ class CouponApplyAPIView(generics.CreateAPIView):
                 )
             else:
                 return Response(
-                    {"message": "No items eligible for the coupon", "icon": "info"},
+                    {"message": "No items eligible for the coupon",
+                     "icon": "info"},
                     status=status.HTTP_200_OK,
                 )
 
@@ -360,3 +314,261 @@ class CouponApplyAPIView(generics.CreateAPIView):
                 {"message": f"An error occurred: {str(e)}", "icon": "error"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class StudentSummaryAPIView(generics.ListAPIView):
+    serializer_class = api_serializer.StudentSummarySerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+
+        total_courses = api_models.EnrolledCourse.objects.filter(
+            user=user).count()
+        completed_lessons = api_models.CompletedLesson.objects.filter(
+            user=user).count()
+        achieved_certificates = api_models.Certificate.objects.filter(
+            user=user).count()
+
+        return [{
+            "total_courses": total_courses,
+            "completed_lessons": completed_lessons,
+            "achieved_certificates": achieved_certificates,
+        }]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class StudentCourseListAPIView(generics.ListAPIView):
+    serializer_class = api_serializer.EnrolledCourseSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+        return api_models.EnrolledCourse.objects.filter(user=user)
+
+
+class StudentCourseDetailAPIView(generics.RetrieveAPIView):
+    serializer_class = api_serializer.EnrolledCourseSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'enrollment_id'
+
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        enrollment_id = self.kwargs['enrollment_id']
+
+        user = User.objects.get(id=user_id)
+        return api_models.EnrolledCourse.objects.get(
+            user=user,
+            enrollment_id=enrollment_id)
+
+
+class StudentCourseCompletedCreateAPIView(generics.CreateAPIView):
+    serializer_class = api_serializer.CompletedLessonSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        course_id = request.data['course_id']
+        variant_item_id = request.data['variant_item_id']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+        variant_item = api_models.VariantItem.objects.get(
+            variant_item_id=variant_item_id)
+
+        completed_lessons = api_models.CompletedLesson.objects.filter(
+            user=user, course=course, variant_item=variant_item).first()
+
+        if completed_lessons:
+            completed_lessons.delete()
+            return Response({"message": "Course marked as not completed"})
+
+        else:
+            api_models.CompletedLesson.objects.create(
+                user=user,
+                course=course,
+                variant_item=variant_item)
+            return Response({"message": "Course marked as completed"})
+
+
+class StudentNoteCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = api_serializer.NoteSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        enrollment_id = self.kwargs['enrollment_id']
+
+        user = User.objects.get(id=user_id)
+        enrolled = api_models.EnrolledCourse.objects.get(
+            enrollment_id=enrollment_id)
+
+        return api_models.Note.objects.filter(user=user,
+                                              course=enrolled.course)
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        enrollment_id = request.data['enrollment_id']
+        title = request.data['title']
+        note = request.data['note']
+
+        user = User.objects.get(id=user_id)
+        enrolled = api_models.EnrolledCourse.objects.get(
+            enrollment_id=enrollment_id)
+
+        api_models.Note.objects.create(user=user, course=enrolled.course,
+                                       note=note, title=title)
+
+        return Response({"message": "Note created successfullly"},
+                        status=status.HTTP_201_CREATED)
+
+
+class StudentNoteDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = api_serializer.NoteSerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        enrollment_id = self.kwargs['enrollment_id']
+        note_id = self.kwargs['note_id']
+
+        user = User.objects.get(id=user_id)
+        enrolled = api_models.EnrolledCourse.objects.get(
+            enrollment_id=enrollment_id)
+        note = api_models.Note.objects.get(user=user,
+                                           course=enrolled.course, id=note_id)
+        return note
+
+
+class StudentRateCourseCreateAPIView(generics.CreateAPIView):
+    serializer_class = api_serializer.ReviewSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        course_id = request.data['course_id']
+        rating = request.data['rating']
+        review = request.data['review']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+
+        api_models.Review.objects.create(
+            user=user,
+            course=course,
+            review=review,
+            rating=rating,
+            active=True,
+        )
+
+        return Response({"message": "Review created successfullly"},
+                        status=status.HTTP_201_CREATED)
+
+
+class StudentRateCourseUpdateAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = api_serializer.ReviewSerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        review_id = self.kwargs['review_id']
+
+        user = User.objects.get(id=user_id)
+        return api_models.Review.objects.get(id=review_id, user=user)
+
+
+class StudentWishListListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = api_serializer.WishlistSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+        return api_models.Wishlist.objects.filter(user=user)
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        course_id = request.data['course_id']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+
+        wishlist = api_models.Wishlist.objects.filter(user=user,
+                                                      course=course).first()
+        if wishlist:
+            wishlist.delete()
+            return Response({"message": "Wishlist Deleted"},
+                            status=status.HTTP_200_OK)
+        else:
+            api_models.Wishlist.objects.create(
+                user=user, course=course
+            )
+            return Response({"message": "Wishlist Created"},
+                            status=status.HTTP_201_CREATED)
+
+
+class QuestionAnswerListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = api_serializer.Question_AnswerSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        course = api_models.Course.objects.get(id=course_id)
+        return api_models.Question_Answer.objects.filter(course=course)
+
+    def create(self, request, *args, **kwargs):
+        course_id = request.data['course_id']
+        user_id = request.data['user_id']
+        title = request.data['title']
+        message = request.data['message']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+
+        question = api_models.Question_Answer.objects.create(
+            course=course,
+            user=user,
+            title=title
+        )
+
+        api_models.Question_Answer_Message.objects.create(
+            course=course,
+            user=user,
+            message=message,
+            question=question
+        )
+
+        return Response({"message": "Group conversation Started"},
+                        status=status.HTTP_201_CREATED)
+
+
+class QuestionAnswerMessageSendAPIView(generics.CreateAPIView):
+    serializer_class = api_serializer.Question_Answer_MessageSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        course_id = request.data['course_id']
+        qa_id = request.data['qa_id']
+        user_id = request.data['user_id']
+        message = request.data['message']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+        question = api_models.Question_Answer.objects.get(qa_id=qa_id)
+        api_models.Question_Answer_Message.objects.create(
+            course=course,
+            user=user,
+            message=message,
+            question=question
+        )
+
+        question_serializer = api_serializer.Question_AnswerSerializer(
+            question)
+        return Response({"messgae": "Message Sent",
+                         "question": question_serializer.data})
