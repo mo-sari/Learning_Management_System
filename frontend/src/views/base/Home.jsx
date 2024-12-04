@@ -19,8 +19,6 @@ function Index() {
     fetchCourses(); // Call the function here
   }, []);
 
-  console.log(courses);
-
   return (
     <>
       <BaseHeader />

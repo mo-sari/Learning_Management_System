@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useCartContext } from "../../context/CartContext";
+import { useAuthStore } from "../../store/auth";
 
 function BaseHeader() {
   const { cartCount } = useCartContext();
+
+  const user = useAuthStore().isLoggedIn();
 
   return (
     <div>
@@ -164,16 +167,32 @@ function BaseHeader() {
                 Search <i className="fas fa-search"></i>
               </button>
             </form>
-            <Link to="/login/" className="btn btn-primary ms-2" type="submit">
-              Login <i className="fas fa-sign-in-alt"></i>
-            </Link>
-            <Link
-              to="/register/"
-              className="btn btn-primary ms-2"
-              type="submit"
-            >
-              Register <i className="fas fa-user-plus"> </i>
-            </Link>
+            {!user ? (
+              <>
+                <Link
+                  to="/login/"
+                  className="btn btn-primary ms-2"
+                  type="submit"
+                >
+                  Login <i className="fas fa-sign-in-alt"></i>
+                </Link>
+                <Link
+                  to="/register/"
+                  className="btn btn-primary ms-2"
+                  type="submit"
+                >
+                  Register <i className="fas fa-user-plus"> </i>
+                </Link>
+              </>
+            ) : (
+              <Link
+                to="/logout/"
+                className="btn btn-primary ms-2"
+                type="submit"
+              >
+                Logout <i className="fas fa-sign-in-alt"></i>
+              </Link>
+            )}
             <Link className="btn btn-success ms-2" to="/cart/">
               Cart ({cartCount}) <i className="fas fa-shopping-cart"> </i>
             </Link>

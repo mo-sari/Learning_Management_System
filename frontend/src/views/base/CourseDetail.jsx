@@ -22,7 +22,6 @@ function CourseDetail() {
   useEffect(() => {
     fetchCourse();
   }, [fetchCourse]);
-  console.log(course);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;

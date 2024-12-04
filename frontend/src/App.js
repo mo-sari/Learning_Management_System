@@ -19,6 +19,7 @@ import {
   Success,
 } from "./views/base";
 import { CartProvider } from "./context/CartContext";
+import { StudentCoruseDetail, StudentDashboard } from "./views/student";
 
 function App() {
   return (
@@ -49,6 +50,13 @@ function App() {
             <Route path="/cart/" element={<Cart />} />
             <Route path="/checkout/:order_oid/" element={<Checkout />} />
             <Route path="/search/" element={<Search />} />
+
+            {/* Student Routes */}
+            <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route
+              path="/student/courses/:enrollment_id"
+              element={<StudentCoruseDetail />}
+            />
           </Routes>
         </MainWrapper>
       </CartProvider>

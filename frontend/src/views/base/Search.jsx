@@ -40,7 +40,7 @@ function Search() {
             <div className="col-12">
               <div className="mb-6">
                 <h2 className="mb-1 h1">
-                  Showing Results for "LMS System Using Django"
+                  Showing Results for "{searchQuery || ""}"
                 </h2>
               </div>
             </div>
