@@ -94,23 +94,52 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
   const [course, setCourse] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [studentReview, setStudentReview] = useState([]);
+  const [completionPercent, setCompletionPercent] = useState(0);
+
+  const fetchStudentCourseList = async () => {
+    try {
+      const res = await axiosInstance.get(
+        `api/student/course-detail/${UserData()?.user_id}/${enrollment_id}/`
+      );
+      const data = res.data;
+      setCourse(data);
+      setQuestions(data.question_answer);
+      setStudentReview(data.review);
+
+      const completedPercent =
+        data.completed_lesson.length * (100 / data.curriculum.length);
+      setCompletionPercent(Math.round(completedPercent));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const markAsCompleted = async (variantItemId) => {
+    const formData = new FormData();
+
+    formData.append("user_id", UserData()?.user_id);
+    formData.append("course_id", course?.course.id);
+    formData.append("variant_item_id", variantItemId);
+    try {
+      const res = await axiosInstance.post(
+        `api/student/course-completed/`,
+        formData
+      );
+      fetchStudentCourseList();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
-    const fetchStudentCourseList = async () => {
-      try {
-        const res = await axiosInstance.get(
-          `api/student/course-detail/${UserData()?.user_id}/${enrollment_id}/`
-        );
-        setCourse(res.data);
-        setQuestions(res.data.question_answer);
-        setStudentReview(res.data.review);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
     fetchStudentCourseList();
   }, [enrollment_id, axiosInstance]);
 
-  return { course, questions, studentReview };
+  return {
+    course,
+    questions,
+    studentReview,
+    completionPercent,
+    markAsCompleted,
+  };
 };

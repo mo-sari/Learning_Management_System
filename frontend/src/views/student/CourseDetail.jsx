@@ -15,8 +15,13 @@ import { useFetchStudentCourseDetail } from "../base/CustomHooks";
 
 function CourseDetail() {
   const { enrollment_id } = useParams();
-  const { course, questions, studentReview } =
-    useFetchStudentCourseDetail(enrollment_id);
+  const {
+    course,
+    questions,
+    studentReview,
+    completionPercent,
+    markAsCompleted,
+  } = useFetchStudentCourseDetail(enrollment_id);
 
   const [variantItem, setVariantItem] = useState(null);
 
@@ -166,12 +171,12 @@ function CourseDetail() {
                                   <div
                                     className="progress-bar"
                                     role="progressbar"
-                                    style={{ width: `${25}%` }}
-                                    aria-valuenow={25}
+                                    style={{ width: `${completionPercent}%` }}
+                                    aria-valuenow={completionPercent}
                                     aria-valuemin={0}
                                     aria-valuemax={100}
                                   >
-                                    25%
+                                    {completionPercent}%
                                   </div>
                                 </div>
                                 {/* Item */}
@@ -235,6 +240,16 @@ function CourseDetail() {
                                                   className="form-check-input ms-2"
                                                   name=""
                                                   id=""
+                                                  onChange={() =>
+                                                    markAsCompleted(
+                                                      l.variant_item_id
+                                                    )
+                                                  }
+                                                  checked={course.completed_lesson?.some(
+                                                    (cl) =>
+                                                      cl.variant_item.id ===
+                                                      l.id
+                                                  )}
                                                 />
                                               </div>
                                             </div>
