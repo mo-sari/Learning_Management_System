@@ -46,10 +46,20 @@ class EnrolledCourseAdminHelper(admin.ModelAdmin):
         return obj.course.title
 
 
+class VariantItemAdminHelper(admin.ModelAdmin):
+    list_display = ['get_variant_item_id', 'title', 'get_course_name']
+
+    def get_course_name(self, obj):
+        return obj.variant.course.title
+
+    def get_variant_item_id(self, obj):
+        return obj.variant_item_id
+
+
 admin.site.register(models.Category)
 admin.site.register(models.Course, CourseAdminHelper)
 admin.site.register(models.Variant, VariantAdminHelper)
-admin.site.register(models.VariantItem)
+admin.site.register(models.VariantItem, VariantItemAdminHelper)
 admin.site.register(models.Question_Answer)
 admin.site.register(models.Note)
 admin.site.register(models.Teacher)

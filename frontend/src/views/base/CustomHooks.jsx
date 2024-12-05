@@ -94,6 +94,7 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
   const [course, setCourse] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [studentReview, setStudentReview] = useState([]);
+
   const [completionPercent, setCompletionPercent] = useState(0);
 
   const fetchStudentCourseList = async () => {
@@ -101,6 +102,7 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
       const res = await axiosInstance.get(
         `api/student/course-detail/${UserData()?.user_id}/${enrollment_id}/`
       );
+      console.log(course);
       const data = res.data;
       setCourse(data);
       setQuestions(data.question_answer);
@@ -131,6 +133,25 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
     }
   };
 
+  const submitReview = async (review) => {
+    const formDate = new FormData();
+    formDate.append("user_id", UserData()?.user_id);
+    formDate.append("course_id", course?.course.id);
+    formDate.append("rating", review.rating);
+    formDate.append("review", review.review_msg);
+
+    try {
+      const res = axiosInstance.post(`api/student/rate-course/`, formDate);
+      Toast().fire({
+        icon: "success",
+        title: "Review created",
+      });
+      fetchStudentCourseList();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchStudentCourseList();
   }, [enrollment_id, axiosInstance]);
@@ -141,5 +162,6 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
     studentReview,
     completionPercent,
     markAsCompleted,
+    submitReview,
   };
 };

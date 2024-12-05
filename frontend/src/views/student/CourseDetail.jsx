@@ -12,8 +12,12 @@ import Modal from "react-bootstrap/Modal";
 import { useParams } from "react-router-dom";
 
 import { useFetchStudentCourseDetail } from "../base/CustomHooks";
+import UserData from "../plugin/UserData";
 
 function CourseDetail() {
+  // TODO.... in this part discussion part is not complete, I must customize the UI
+  // myself to do it without modals, leaving a review works but should be able to list
+  // and update them either
   const { enrollment_id } = useParams();
   const {
     course,
@@ -21,8 +25,27 @@ function CourseDetail() {
     studentReview,
     completionPercent,
     markAsCompleted,
+    submitReview,
   } = useFetchStudentCourseDetail(enrollment_id);
+  // =========================================================================
+  // Discussion part
+  const [addNewQuestion, setAddNewQuestion] = useState(false);
+  const handleNewQuestionClose = () => setAddNewQuestion(false);
+  const handleNewQuestionOpen = () => setAddNewQuestion(true);
 
+  const [newQuestion, setNewQuestion] = useState({
+    title: "",
+    message: "",
+  });
+  const handleCreateQuestion = (e) => {
+    setNewQuestion({
+      ...newQuestion,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // =========================================================================
+  // video playing part
   const [variantItem, setVariantItem] = useState(null);
 
   const [show, setShow] = useState(false);
@@ -32,22 +55,40 @@ function CourseDetail() {
     setVariantItem(l);
   };
 
-  const [noteShow, setNoteShow] = useState(false);
-  const handleNoteClose = () => setNoteShow(false);
-  const handleNoteShow = () => {
-    setNoteShow(true);
-  };
-
+  // ==========================================================================
+  // conversation part
   const [ConversationShow, setConversationShow] = useState(false);
   const handleConversationClose = () => setConversationShow(false);
   const handleConversationShow = () => {
     setConversationShow(true);
   };
 
+  // ==========================================================================
+  // review part
+  const [review, setReview] = useState({
+    rating: 1,
+    review_msg: "",
+  });
+  const handleReview = (e) => {
+    setReview({
+      ...review,
+      [e.target.name]: e.target.value,
+    });
+  };
+  console.log(review);
+
+  const handleSubmitReview = (e) => {
+    e.preventDefault();
+    submitReview(review);
+    setReview({
+      rating: 1,
+      review_msg: "",
+    });
+  };
+
   return (
     <>
       <BaseHeader />
-
       <section className="pt-5 pb-5">
         <div className="container">
           {/* Header Here */}
@@ -90,24 +131,6 @@ function CourseDetail() {
                                 aria-selected="true"
                               >
                                 Course Lectures
-                              </button>
-                            </li>
-                            {/* Tab item */}
-                            <li
-                              className="nav-item me-2 me-sm-4"
-                              role="presentation"
-                            >
-                              <button
-                                className="nav-link mb-2 mb-md-0"
-                                id="course-pills-tab-2"
-                                data-bs-toggle="pill"
-                                data-bs-target="#course-pills-2"
-                                type="button"
-                                role="tab"
-                                aria-controls="course-pills-2"
-                                aria-selected="false"
-                              >
-                                Notes
                               </button>
                             </li>
                             {/* Tab item */}
@@ -263,148 +286,6 @@ function CourseDetail() {
                               </div>
                               {/* Accordion END */}
                             </div>
-
-                            <div
-                              className="tab-pane fade"
-                              id="course-pills-2"
-                              role="tabpanel"
-                              aria-labelledby="course-pills-tab-2"
-                            >
-                              <div className="card">
-                                <div className="card-header border-bottom p-0 pb-3">
-                                  <div className="d-sm-flex justify-content-between align-items-center">
-                                    <h4 className="mb-0 p-3">All Notes</h4>
-                                    {/* Add Note Modal */}
-                                    <button
-                                      type="button"
-                                      className="btn btn-primary me-3"
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#exampleModal"
-                                    >
-                                      Add Note <i className="fas fa-pen"></i>
-                                    </button>
-                                    <div
-                                      className="modal fade"
-                                      id="exampleModal"
-                                      tabIndex={-1}
-                                      aria-labelledby="exampleModalLabel"
-                                      aria-hidden="true"
-                                    >
-                                      <div className="modal-dialog modal-dialog-centered">
-                                        <div className="modal-content">
-                                          <div className="modal-header">
-                                            <h5
-                                              className="modal-title"
-                                              id="exampleModalLabel"
-                                            >
-                                              Add New Note{" "}
-                                              <i className="fas fa-pen"></i>
-                                            </h5>
-                                            <button
-                                              type="button"
-                                              className="btn-close"
-                                              data-bs-dismiss="modal"
-                                              aria-label="Close"
-                                            />
-                                          </div>
-                                          <div className="modal-body">
-                                            <form>
-                                              <div className="mb-3">
-                                                <label
-                                                  htmlFor="exampleInputEmail1"
-                                                  className="form-label"
-                                                >
-                                                  Note Title
-                                                </label>
-                                                <input
-                                                  type="text"
-                                                  className="form-control"
-                                                />
-                                              </div>
-                                              <div className="mb-3">
-                                                <label
-                                                  htmlFor="exampleInputPassword1"
-                                                  className="form-label"
-                                                >
-                                                  Note Content
-                                                </label>
-                                                <textarea
-                                                  className="form-control"
-                                                  name=""
-                                                  id=""
-                                                  cols="30"
-                                                  rows="10"
-                                                ></textarea>
-                                              </div>
-                                              <button
-                                                type="button"
-                                                className="btn btn-secondary me-2"
-                                                data-bs-dismiss="modal"
-                                              >
-                                                <i className="fas fa-arrow-left"></i>{" "}
-                                                Close
-                                              </button>
-                                              <button
-                                                type="submit"
-                                                className="btn btn-primary"
-                                              >
-                                                Save Note{" "}
-                                                <i className="fas fa-check-circle"></i>
-                                              </button>
-                                            </form>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="card-body p-0 pt-3">
-                                  {/* Note item start */}
-                                  <div className="row g-4 p-3">
-                                    <div className="col-sm-11 col-xl-11 shadow p-3 m-3 rounded">
-                                      <h5>
-                                        {" "}
-                                        What is Digital Marketing What is
-                                        Digital Marketing
-                                      </h5>
-                                      <p>
-                                        Arranging rapturous did believe him all
-                                        had supported. Supposing so be resolving
-                                        breakfast am or perfectly. It drew a
-                                        hill from me. Valley by oh twenty direct
-                                        me so. Departure defective arranging
-                                        rapturous did believe him all had
-                                        supported. Family months lasted simple
-                                        set nature vulgar him. Picture for
-                                        attempt joy excited ten carried manners
-                                        talking how. Family months lasted simple
-                                        set nature vulgar him. Picture for
-                                        attempt joy excited ten carried manners
-                                        talking how.
-                                      </p>
-                                      {/* Buttons */}
-                                      <div className="hstack gap-3 flex-wrap">
-                                        <a
-                                          onClick={handleNoteShow}
-                                          className="btn btn-success mb-0"
-                                        >
-                                          <i className="bi bi-pencil-square me-2" />{" "}
-                                          Edit
-                                        </a>
-                                        <a
-                                          href="#"
-                                          className="btn btn-danger mb-0"
-                                        >
-                                          <i className="bi bi-trash me-2" />{" "}
-                                          Delete
-                                        </a>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <hr />
-                                </div>
-                              </div>
-                            </div>
                             <div
                               className="tab-pane fade"
                               id="course-pills-3"
@@ -436,10 +317,10 @@ function CourseDetail() {
                                     </div>
                                     <div className="col-sm-6 col-lg-3">
                                       <a
-                                        href="#"
+                                        onChange={handleNewQuestionOpen}
                                         className="btn btn-primary mb-0 w-100"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#modalCreatePost"
+                                        data-bs-target="#questionModal"
                                       >
                                         Ask Question
                                       </a>
@@ -504,12 +385,18 @@ function CourseDetail() {
                                   {/* Title */}
                                   <h4 className="mb-3 p-3">Leave a Review</h4>
                                   <div className="mt-2">
-                                    <form className="row g-3 p-3">
+                                    <form
+                                      onSubmit={handleSubmitReview}
+                                      className="row g-3 p-3"
+                                    >
                                       {/* Rating */}
                                       <div className="col-12 bg-light-input">
                                         <select
                                           id="inputState2"
+                                          name="rating"
                                           className="form-select js-choice"
+                                          defaultValue={review.rating}
+                                          onChange={handleReview}
                                         >
                                           <option value={1}>★☆☆☆☆ (1/5)</option>
                                           <option value={2}>★★☆☆☆ (2/5)</option>
@@ -525,7 +412,9 @@ function CourseDetail() {
                                           id="exampleFormControlTextarea1"
                                           placeholder="Your review"
                                           rows={3}
-                                          defaultValue={""}
+                                          name="review_msg"
+                                          value={review.review_msg}
+                                          onChange={handleReview}
                                         />
                                       </div>
                                       {/* Button */}
@@ -575,32 +464,38 @@ function CourseDetail() {
         </Modal.Footer>
       </Modal>
 
-      {/* Note Edit Modal */}
-      <Modal show={noteShow} size="lg" onHide={handleNoteClose}>
+      {/* Question Modal */}
+      <Modal
+        id="questionModal"
+        show={addNewQuestion}
+        size="lg"
+        onHide={handleNewQuestionClose}
+      >
         <Modal.Header closeButton>
-          <Modal.Title>Note: Note Title</Modal.Title>
+          <Modal.Title>Ask Question</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form>
             <div className="mb-3">
               <label htmlFor="exampleInputEmail1" className="form-label">
-                Note Title
+                Question Title
               </label>
               <input
-                defaultValue={null}
+                value={newQuestion.title}
                 name="title"
+                onChange={handleCreateQuestion}
                 type="text"
                 className="form-control"
               />
             </div>
             <div className="mb-3">
               <label htmlFor="exampleInputPassword1" className="form-label">
-                Note Content
+                Question Message
               </label>
               <textarea
-                onChange={null}
-                defaultValue={null}
-                name="note"
+                value={newQuestion.message}
+                name="message"
+                onChange={handleCreateQuestion}
                 className="form-control"
                 cols="30"
                 rows="10"
@@ -609,18 +504,18 @@ function CourseDetail() {
             <button
               type="button"
               className="btn btn-secondary me-2"
-              onClick={null}
+              onClick={handleNewQuestionClose}
             >
               <i className="fas fa-arrow-left"></i> Close
             </button>
             <button type="submit" className="btn btn-primary">
-              Save Note <i className="fas fa-check-circle"></i>
+              Send Message <i className="fas fa-check-circle"></i>
             </button>
           </form>
         </Modal.Body>
       </Modal>
 
-      {/* Note Edit Modal */}
+      {/* Conversation Edit Modal */}
       <Modal show={ConversationShow} size="lg" onHide={handleConversationClose}>
         <Modal.Header closeButton>
           <Modal.Title>Lesson: 123</Modal.Title>
@@ -813,20 +708,20 @@ function CourseDetail() {
               </li>
             </ul>
 
-            <form class="w-100 d-flex">
+            <form className="w-100 d-flex">
               <textarea
                 name="message"
-                class="one form-control pe-4 bg-light w-75"
+                className="one form-control pe-4 bg-light w-75"
                 id="autoheighttextarea"
                 rows="2"
                 placeholder="What's your question?"
               ></textarea>
-              <button class="btn btn-primary ms-2 mb-0 w-25" type="button">
+              <button className="btn btn-primary ms-2 mb-0 w-25" type="button">
                 Post <i className="fas fa-paper-plane"></i>
               </button>
             </form>
 
-            <form class="w-100">
+            <form className="w-100">
               <input
                 name="title"
                 type="text"
@@ -835,19 +730,18 @@ function CourseDetail() {
               />
               <textarea
                 name="message"
-                class="one form-control pe-4 mb-2 bg-light"
+                className="one form-control pe-4 mb-2 bg-light"
                 id="autoheighttextarea"
                 rows="5"
                 placeholder="What's your question?"
               ></textarea>
-              <button class="btn btn-primary mb-0 w-25" type="button">
+              <button className="btn btn-primary mb-0 w-25" type="button">
                 Post <i className="fas fa-paper-plane"></i>
               </button>
             </form>
           </div>
         </Modal.Body>
       </Modal>
-
       <BaseFooter />
     </>
   );
