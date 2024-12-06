@@ -42,6 +42,8 @@ urlpatterns = [
          views.QuestionAnswerListCreateAPIView.as_view()),
     path("student/question-answer-message-create/",
          views.QuestionAnswerMessageSendAPIView.as_view()),
+    path("newStudent/reviews/<user_id>/<course_id>/",
+         views.CourseReivewListAPIView.as_view()),
 
     # Teacher Routes
     path("teacher/summary/<teacher_id>/",

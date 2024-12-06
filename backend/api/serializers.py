@@ -155,6 +155,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = api_models.Review
 
+
     def __init__(self, *args, **kwargs):
         super(ReviewSerializer, self).__init__(*args, **kwargs)
         request = self.context.get("request")
@@ -206,7 +207,7 @@ class EnrolledCourseSerializer(serializers.ModelSerializer):
     curriculum = VariantSerializer(many=True, read_only=True)
     note = NoteSerializer(many=True, read_only=True)
     question_answer = Question_AnswerSerializer(many=True, read_only=True)
-    review = ReviewSerializer(many=False, read_only=True)
+    review = ReviewSerializer(many=True, read_only=True)
 
     class Meta:
         fields = '__all__'

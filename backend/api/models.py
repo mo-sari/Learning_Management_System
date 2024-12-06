@@ -394,7 +394,7 @@ class EnrolledCourse(models.Model):
 
     def review(self):
         return Review.objects.filter(course=self.course,
-                                     user=self.user).first()
+                                     user=self.user)
 
 
 class Note(models.Model):
@@ -426,6 +426,9 @@ class Review(models.Model):
 
     def profile(self):
         return Profile.objects.get(user=self.user)
+
+    class Meta:
+        ordering = ['-date']
 
 
 class Notification(models.Model):

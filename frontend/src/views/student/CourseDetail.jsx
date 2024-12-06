@@ -6,13 +6,15 @@ import Header from "./Partials/Header";
 
 import ReactPlayer from "react-player";
 import { FaPlay } from "react-icons/fa";
+import { MdQuickreply } from "react-icons/md";
+import moment from "moment";
 
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useParams } from "react-router-dom";
+import { CgFolderRemove } from "react-icons/cg";
 
 import { useFetchStudentCourseDetail } from "../base/CustomHooks";
-import UserData from "../plugin/UserData";
 
 function CourseDetail() {
   // TODO.... in this part discussion part is not complete, I must customize the UI
@@ -26,6 +28,7 @@ function CourseDetail() {
     completionPercent,
     markAsCompleted,
     submitReview,
+    removeReview,
   } = useFetchStudentCourseDetail(enrollment_id);
   // =========================================================================
   // Discussion part
@@ -65,6 +68,7 @@ function CourseDetail() {
 
   // ==========================================================================
   // review part
+  const [isReviewEditMode, setIsReviewEditMode] = useState(false);
   const [review, setReview] = useState({
     rating: 1,
     review_msg: "",
@@ -75,7 +79,6 @@ function CourseDetail() {
       [e.target.name]: e.target.value,
     });
   };
-  console.log(review);
 
   const handleSubmitReview = (e) => {
     e.preventDefault();
@@ -427,6 +430,99 @@ function CourseDetail() {
                                         </button>
                                       </div>
                                     </form>
+                                    {/* {studentReview.map((r) => {
+                                      return <h6>{r.review}</h6>;
+                                    })} */}
+                                    {/* Start Of The Review */}
+                                    <div className="container text-body">
+                                      <div className="row d-flex justify-content-center">
+                                        {studentReview.map((r) => {
+                                          return (
+                                            <div className="d-flex flex-start mb-4">
+                                              <img
+                                                className="rounded-circle shadow-1-strong me-3"
+                                                src={r?.profile?.image}
+                                                alt="avatar"
+                                                width="65"
+                                                height="65"
+                                              />
+                                              <div className="card flex-grow-1">
+                                                <div className="card-body p-4">
+                                                  <div className="">
+                                                    <h5>
+                                                      {r?.user.name}
+                                                      <span
+                                                        style={{
+                                                          color: "gold",
+                                                        }}
+                                                      >
+                                                        <svg
+                                                          xmlns="http://www.w3.org/2000/svg"
+                                                          viewBox="0 0 1792 1792"
+                                                          width="15"
+                                                          height="15"
+                                                          style={{
+                                                            marginLeft: "10px",
+                                                            marginRight: "5px",
+                                                          }}
+                                                        >
+                                                          <path
+                                                            fill="currentColor"
+                                                            d="M1728 647q0 22-26 48l-363 354 86 500q1 7 1 20 0 21-10.5 35.5t-30.5 14.5q-19 0-40-12l-449-236-449 236q-22 12-40 12-21 0-31.5-14.5t-10.5-35.5q0-6 2-20l86-500-364-354q-25-27-25-48 0-37 56-46l502-73 225-455q19-41 49-41t49 41l225 455 502 73q56 9 56 46z"
+                                                          ></path>
+                                                        </svg>
+                                                        {r.rating}
+                                                      </span>
+                                                    </h5>
+
+                                                    <p className="small">
+                                                      {moment(r.date).format(
+                                                        "DD MMM, YYYY"
+                                                      )}
+                                                    </p>
+                                                    <p className="mb-0">
+                                                      {r.review}
+                                                    </p>
+
+                                                    <div
+                                                      style={{
+                                                        display: "flex",
+                                                        justifyContent: "end",
+                                                      }}
+                                                    >
+                                                      <div></div>{" "}
+                                                      {/* Empty space for spacing */}
+                                                      <div>
+                                                        <CgFolderRemove
+                                                          style={{
+                                                            marginRight: "10px",
+                                                            width: "30px",
+                                                            height: "30px",
+                                                            color: "grey",
+                                                          }}
+                                                          onClick={() =>
+                                                            removeReview(r)
+                                                          }
+                                                        />
+                                                        <MdQuickreply
+                                                          style={{
+                                                            width: "30px",
+                                                            height: "30px",
+                                                            color: "grey",
+                                                          }}
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+
+                                    {/* End Of The Reviews */}
                                   </div>
                                 </div>
                               </div>

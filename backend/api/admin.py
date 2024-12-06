@@ -56,6 +56,16 @@ class VariantItemAdminHelper(admin.ModelAdmin):
         return obj.variant_item_id
 
 
+class ReviewAdminHelper(admin.ModelAdmin):
+    list_display = ['id', 'get_course_name', 'get_user_name']
+
+    def get_course_name(self, obj):
+        return obj.course.title
+
+    def get_user_name(self, obj):
+        return obj.user.name
+
+
 admin.site.register(models.Category)
 admin.site.register(models.Course, CourseAdminHelper)
 admin.site.register(models.Variant, VariantAdminHelper)
@@ -68,7 +78,7 @@ admin.site.register(models.Cart, CartAdminHelper)
 admin.site.register(models.Certificate)
 admin.site.register(models.CompletedLesson)
 admin.site.register(models.EnrolledCourse, EnrolledCourseAdminHelper)
-admin.site.register(models.Review)
+admin.site.register(models.Review, ReviewAdminHelper)
 admin.site.register(models.Notification)
 admin.site.register(models.Wishlist)
 admin.site.register(models.CartOrder)

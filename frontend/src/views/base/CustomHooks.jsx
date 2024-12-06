@@ -102,12 +102,12 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
       const res = await axiosInstance.get(
         `api/student/course-detail/${UserData()?.user_id}/${enrollment_id}/`
       );
-      console.log(course);
       const data = res.data;
+      console.log(data);
       setCourse(data);
       setQuestions(data.question_answer);
       setStudentReview(data.review);
-
+      console.log(data.review);
       const completedPercent =
         data.completed_lesson.length * (100 / data.curriculum.length);
       setCompletionPercent(Math.round(completedPercent));
@@ -152,6 +152,21 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
     }
   };
 
+  const removeReview = async (review) => {
+    try {
+      const res = await axiosInstance.delete(
+        `api/student/review-detail/${UserData()?.user_id}/${review.id}/`
+      );
+      Toast().fire({
+        icon: "success",
+        title: "Review deleted",
+      });
+      fetchStudentCourseList();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchStudentCourseList();
   }, [enrollment_id, axiosInstance]);
@@ -163,5 +178,6 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
     completionPercent,
     markAsCompleted,
     submitReview,
+    removeReview,
   };
 };

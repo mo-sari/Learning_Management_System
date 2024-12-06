@@ -478,7 +478,7 @@ class StudentRateCourseCreateAPIView(generics.CreateAPIView):
                         status=status.HTTP_201_CREATED)
 
 
-class StudentRateCourseUpdateAPIView(generics.RetrieveUpdateAPIView):
+class StudentRateCourseUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = api_serializer.ReviewSerializer
     permission_classes = [AllowAny]
 
@@ -1050,3 +1050,18 @@ class CourseVariantItemDeleteAPIVIew(generics.DestroyAPIView):
         return api_models.VariantItem.objects.get(
             variant=variant,
             variant_item_id=variant_item_id)
+
+
+class CourseReivewListAPIView(generics.ListAPIView):
+    serializer_class = api_serializer.ReviewSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        course_id = self.kwargs['course_id']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+
+        return api_models.Review.objects.filter(user=user, course=course)
+
