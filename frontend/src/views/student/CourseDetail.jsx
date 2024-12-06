@@ -6,20 +6,17 @@ import Header from "./Partials/Header";
 
 import ReactPlayer from "react-player";
 import { FaPlay } from "react-icons/fa";
-import { MdQuickreply } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
+import { CgFolderRemove } from "react-icons/cg";
 import moment from "moment";
 
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useParams } from "react-router-dom";
-import { CgFolderRemove } from "react-icons/cg";
 
 import { useFetchStudentCourseDetail } from "../base/CustomHooks";
 
 function CourseDetail() {
-  // TODO.... in this part discussion part is not complete, I must customize the UI
-  // myself to do it without modals, leaving a review works but should be able to list
-  // and update them either
   const { enrollment_id } = useParams();
   const {
     course,
@@ -29,7 +26,9 @@ function CourseDetail() {
     markAsCompleted,
     submitReview,
     removeReview,
+    editReview,
   } = useFetchStudentCourseDetail(enrollment_id);
+
   // =========================================================================
   // Discussion part
   const [addNewQuestion, setAddNewQuestion] = useState(false);
@@ -69,10 +68,12 @@ function CourseDetail() {
   // ==========================================================================
   // review part
   const [isReviewEditMode, setIsReviewEditMode] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState(null);
   const [review, setReview] = useState({
     rating: 1,
-    review_msg: "",
+    review: "",
   });
+
   const handleReview = (e) => {
     setReview({
       ...review,
@@ -80,13 +81,42 @@ function CourseDetail() {
     });
   };
 
-  const handleSubmitReview = (e) => {
-    e.preventDefault();
-    submitReview(review);
+  const reviewCreate = (e) => {
+    setIsReviewEditMode(false);
+    handleCreateReview(e);
+  };
+
+  const reviewUpdate = (oldReview) => {
+    setIsReviewEditMode(true);
+    setReview({
+      rating: oldReview.rating,
+      review: oldReview.review,
+    });
+    setSelectedReviewId(oldReview.id);
+  };
+
+  const reviewRoutine = () => {
     setReview({
       rating: 1,
-      review_msg: "",
+      review: "",
     });
+    setIsReviewEditMode(false);
+    setSelectedReviewId(null);
+  };
+
+  const handleCreateReview = (e) => {
+    e.preventDefault();
+
+    submitReview(review);
+    reviewRoutine();
+  };
+
+  const handleUpdateReview = (e) => {
+    e.preventDefault();
+    review.id = selectedReviewId;
+
+    editReview(review);
+    reviewRoutine();
   };
 
   return (
@@ -388,17 +418,14 @@ function CourseDetail() {
                                   {/* Title */}
                                   <h4 className="mb-3 p-3">Leave a Review</h4>
                                   <div className="mt-2">
-                                    <form
-                                      onSubmit={handleSubmitReview}
-                                      className="row g-3 p-3"
-                                    >
+                                    <form className="row g-3 p-3">
                                       {/* Rating */}
                                       <div className="col-12 bg-light-input">
                                         <select
                                           id="inputState2"
                                           name="rating"
                                           className="form-select js-choice"
-                                          defaultValue={review.rating}
+                                          value={review.rating}
                                           onChange={handleReview}
                                         >
                                           <option value={1}>★☆☆☆☆ (1/5)</option>
@@ -415,19 +442,30 @@ function CourseDetail() {
                                           id="exampleFormControlTextarea1"
                                           placeholder="Your review"
                                           rows={3}
-                                          name="review_msg"
-                                          value={review.review_msg}
+                                          name="review"
+                                          value={review.review}
                                           onChange={handleReview}
                                         />
                                       </div>
                                       {/* Button */}
                                       <div className="col-12">
-                                        <button
-                                          type="submit"
-                                          className="btn btn-primary mb-0"
-                                        >
-                                          Post Review
-                                        </button>
+                                        {isReviewEditMode ? (
+                                          <button
+                                            type="submit"
+                                            className="btn btn-primary mb-0"
+                                            onClick={handleUpdateReview}
+                                          >
+                                            Edit Review
+                                          </button>
+                                        ) : (
+                                          <button
+                                            type="submit"
+                                            className="btn btn-primary mb-0"
+                                            onClick={reviewCreate}
+                                          >
+                                            Post Review
+                                          </button>
+                                        )}
                                       </div>
                                     </form>
                                     {/* {studentReview.map((r) => {
@@ -504,12 +542,16 @@ function CourseDetail() {
                                                             removeReview(r)
                                                           }
                                                         />
-                                                        <MdQuickreply
+
+                                                        <FaEdit
                                                           style={{
                                                             width: "30px",
                                                             height: "30px",
                                                             color: "grey",
                                                           }}
+                                                          onClick={() =>
+                                                            reviewUpdate(r)
+                                                          }
                                                         />
                                                       </div>
                                                     </div>

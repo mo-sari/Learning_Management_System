@@ -138,13 +138,32 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
     formDate.append("user_id", UserData()?.user_id);
     formDate.append("course_id", course?.course.id);
     formDate.append("rating", review.rating);
-    formDate.append("review", review.review_msg);
+    formDate.append("review", review.review);
 
     try {
       const res = axiosInstance.post(`api/student/rate-course/`, formDate);
       Toast().fire({
         icon: "success",
         title: "Review created",
+      });
+      fetchStudentCourseList();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const editReview = async (review) => {
+    const formData = new FormData();
+    formData.append("review", review.review);
+    formData.append("rating", review.rating);
+
+    try {
+      const res = axiosInstance.patch(
+        `api/student/review-detail/${UserData()?.user_id}/${review.id}/`,
+        formData
+      );
+      Toast().fire({
+        icon: "success",
+        title: "Review edited",
       });
       fetchStudentCourseList();
     } catch (error) {
@@ -179,5 +198,6 @@ export const useFetchStudentCourseDetail = (enrollment_id) => {
     markAsCompleted,
     submitReview,
     removeReview,
+    editReview,
   };
 };
